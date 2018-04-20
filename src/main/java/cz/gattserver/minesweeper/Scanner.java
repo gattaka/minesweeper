@@ -3,7 +3,6 @@ package cz.gattserver.minesweeper;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.io.File;
 import java.util.stream.IntStream;
 
@@ -17,14 +16,16 @@ public class Scanner {
 	private static Logger logger = LoggerFactory.getLogger(Scanner.class);
 
 	private File testScreensDir;
-	private ScannerConfig config;
+	private Config config;
+	private Game game;
 
-	public Scanner(String testScreensDir, ScannerConfig config) {
+	public Scanner(String testScreensDir, Config config) {
 		this.testScreensDir = new File(testScreensDir);
 		this.config = config;
+		this.game = new Game(config.getFieldsXCount(), config.getFieldsYCount());
 	}
 
-	public Game capture() {
+	public void capture() {
 		BufferedImage image;
 		try {
 			logger.info("Screenshot");
@@ -34,7 +35,7 @@ public class Scanner {
 		} catch (Exception e) {
 			throw new IllegalStateException("Nezdaøilo se získat screenshot obrazovky");
 		}
-		return parse(image);
+		parse(image);
 	}
 
 	private boolean compare(BufferedImage imgA, File toCompare) {
@@ -47,37 +48,15 @@ public class Scanner {
 			if ((width1 != width2) || (height1 != height2))
 				return false; // 100% rozdíl
 			else {
-				long difference = 0;
 				for (int y = 0; y < height1; y++) {
 					for (int x = 0; x < width1; x++) {
 						int rgbA = imgA.getRGB(x, y);
 						int rgbB = imgB.getRGB(x, y);
-
-						int redA = (rgbA >> 16) & 0xff;
-						int greenA = (rgbA >> 8) & 0xff;
-						int blueA = (rgbA) & 0xff;
-						int redB = (rgbB >> 16) & 0xff;
-						int greenB = (rgbB >> 8) & 0xff;
-						int blueB = (rgbB) & 0xff;
-						difference += Math.abs(redA - redB);
-						difference += Math.abs(greenA - greenB);
-						difference += Math.abs(blueA - blueB);
+						if (rgbA != rgbB)
+							return false;
 					}
 				}
-
-				// Total number of red pixels = width * height
-				// Total number of blue pixels = width * height
-				// Total number of green pixels = width * height
-				// So total number of pixels = width * height * 3
-				double totalPixels = width1 * height1 * 3.0;
-
-				// Normalizing the value of different pixels
-				// for accuracy(average pixels per color
-				// component)
-				double avgDifferentPixels = difference / totalPixels;
-
-				// There are 255 values of pixels in total
-				return avgDifferentPixels == 0;
+				return true;
 			}
 		} catch (Exception e) {
 			logger.error("Nezdaøilo se porovnat obrázky", e);
@@ -88,11 +67,11 @@ public class Scanner {
 	private GameState parseGameState(BufferedImage image) {
 		BufferedImage bi = image.getSubimage(config.getStatusX(), config.getStatusY(), config.getStatusW(),
 				config.getStatusH());
-		if (compare(bi, config.getStatusPlayingFile()))
-			return GameState.PLAYING;
+		if (compare(bi, config.getStatusWonFile()))
+			return GameState.WON;
 		if (compare(bi, config.getStatusLostFile()))
 			return GameState.LOST;
-		return GameState.WON;
+		return GameState.PLAYING;
 	}
 
 	private FieldType parseFieldType(BufferedImage image, int x, int y) {
@@ -105,8 +84,7 @@ public class Scanner {
 			throw new IllegalStateException(e);
 		}
 
-		if (compare(bi, config.getFieldUnknownFile()))
-			return FieldType.UNKNOWN;
+		// if (compare(bi, config.getFieldUnknownFile()))
 		if (compare(bi, config.getField1File()))
 			return FieldType.HINT_1;
 		if (compare(bi, config.getField2File()))
@@ -119,11 +97,12 @@ public class Scanner {
 			return FieldType.HINT_5;
 		if (compare(bi, config.getFieldBlankFile()))
 			return FieldType.BLANK;
-		return FieldType.FLAG;
+		if (compare(bi, config.getFieldFlagFile()))
+			return FieldType.FLAG;
+		return FieldType.UNKNOWN;
 	}
 
-	private Game parse(BufferedImage image) {
-		Game game = new Game(config.getFieldsXCount(), config.getFieldsYCount());
+	private void parse(BufferedImage image) {
 
 		// Game state
 		game.setState(parseGameState(image));
@@ -131,7 +110,9 @@ public class Scanner {
 		// Game fields
 		IntStream.range(0, config.getFieldsYCount()).forEach(y -> IntStream.range(0, config.getFieldsXCount())
 				.forEach(x -> game.getFields()[x][y] = parseFieldType(image, x, y)));
+	}
 
+	public void debugPrint(Game game) {
 		// DEBUG
 		System.out.println("State: " + game.getState());
 		IntStream.range(0, config.getFieldsYCount()).forEach(y -> {
@@ -159,13 +140,16 @@ public class Scanner {
 					System.out.print("- ");
 					break;
 				default:
-					System.out.print("% ");
+				case FLAG:
+					System.out.print("× ");
 					break;
 				}
 			});
 			System.out.println();
 		});
+	}
 
+	public Game getGame() {
 		return game;
 	}
 

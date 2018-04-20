@@ -2,7 +2,7 @@ package cz.gattserver.minesweeper;
 
 import java.io.File;
 
-public class ScannerConfig {
+public class Config {
 
 	private final static String FIELD_1 = "field_1.png";
 	private final static String FIELD_2 = "field_2.png";
@@ -11,9 +11,8 @@ public class ScannerConfig {
 	private final static String FIELD_5 = "field_5.png";
 	private final static String FIELD_BLANK = "field_blank.png";
 	private final static String FIELD_UNKNOWN = "field_unknown.png";
-	// private final static String FIELD_FLAG = "field_flag.png";
-	private final static String STATUS_PLAYING = "status_playing.png";
-	// private final static String STATUS_WON = "status_won.png";
+	private final static String FIELD_FLAG = "field_flag.png";
+	private final static String STATUS_WON = "status_won.png";
 	private final static String STATUS_LOST = "status_lost.png";
 
 	private int screenX;
@@ -41,7 +40,7 @@ public class ScannerConfig {
 		return fieldsXCount;
 	}
 
-	public ScannerConfig setFieldsXCount(int fieldsXCount) {
+	public Config setFieldsXCount(int fieldsXCount) {
 		this.fieldsXCount = fieldsXCount;
 		return this;
 	}
@@ -50,7 +49,7 @@ public class ScannerConfig {
 		return fieldsYCount;
 	}
 
-	public ScannerConfig setFieldsYCount(int fieldsYCount) {
+	public Config setFieldsYCount(int fieldsYCount) {
 		this.fieldsYCount = fieldsYCount;
 		return this;
 	}
@@ -59,7 +58,7 @@ public class ScannerConfig {
 		return screenX;
 	}
 
-	public ScannerConfig setScreenX(int screenX) {
+	public Config setScreenX(int screenX) {
 		this.screenX = screenX;
 		return this;
 	}
@@ -68,7 +67,7 @@ public class ScannerConfig {
 		return screenW;
 	}
 
-	public ScannerConfig setScreenW(int screenW) {
+	public Config setScreenW(int screenW) {
 		this.screenW = screenW;
 		return this;
 	}
@@ -77,7 +76,7 @@ public class ScannerConfig {
 		return screenH;
 	}
 
-	public ScannerConfig setScreenH(int screenH) {
+	public Config setScreenH(int screenH) {
 		this.screenH = screenH;
 		return this;
 	}
@@ -86,7 +85,7 @@ public class ScannerConfig {
 		return screenY;
 	}
 
-	public ScannerConfig setScreenY(int screenY) {
+	public Config setScreenY(int screenY) {
 		this.screenY = screenY;
 		return this;
 	}
@@ -95,7 +94,7 @@ public class ScannerConfig {
 		return statusX;
 	}
 
-	public ScannerConfig setStatusX(int statusX) {
+	public Config setStatusX(int statusX) {
 		this.statusX = statusX;
 		return this;
 	}
@@ -104,7 +103,7 @@ public class ScannerConfig {
 		return statusY;
 	}
 
-	public ScannerConfig setStatusY(int statusY) {
+	public Config setStatusY(int statusY) {
 		this.statusY = statusY;
 		return this;
 	}
@@ -113,7 +112,7 @@ public class ScannerConfig {
 		return statusH;
 	}
 
-	public ScannerConfig setStatusH(int statusH) {
+	public Config setStatusH(int statusH) {
 		this.statusH = statusH;
 		return this;
 	}
@@ -122,7 +121,7 @@ public class ScannerConfig {
 		return statusW;
 	}
 
-	public ScannerConfig setStatusW(int statusW) {
+	public Config setStatusW(int statusW) {
 		this.statusW = statusW;
 		return this;
 	}
@@ -131,7 +130,7 @@ public class ScannerConfig {
 		return inScreenX;
 	}
 
-	public ScannerConfig setInScreenX(int inScreenX) {
+	public Config setInScreenX(int inScreenX) {
 		this.inScreenX = inScreenX;
 		return this;
 	}
@@ -140,7 +139,7 @@ public class ScannerConfig {
 		return inScreenY;
 	}
 
-	public ScannerConfig setInScreenY(int inScreenY) {
+	public Config setInScreenY(int inScreenY) {
 		this.inScreenY = inScreenY;
 		return this;
 	}
@@ -149,7 +148,7 @@ public class ScannerConfig {
 		return fieldW;
 	}
 
-	public ScannerConfig setFieldW(int fieldW) {
+	public Config setFieldW(int fieldW) {
 		this.fieldW = fieldW;
 		return this;
 	}
@@ -158,18 +157,18 @@ public class ScannerConfig {
 		return fieldH;
 	}
 
-	public ScannerConfig setFieldH(int fieldH) {
+	public Config setFieldH(int fieldH) {
 		this.fieldH = fieldH;
 		return this;
 	}
 
-	public ScannerConfig setImagesDirectory(String imagesDirectory) {
+	public Config setImagesDirectory(String imagesDirectory) {
 		this.imagesDirectory = new File(getClass().getClassLoader().getResource("minesweeperonline").getFile());
 		return this;
 	}
 
-	public File getStatusPlayingFile() {
-		return new File(imagesDirectory, STATUS_PLAYING);
+	public File getStatusWonFile() {
+		return new File(imagesDirectory, STATUS_WON);
 	}
 
 	public File getStatusLostFile() {
@@ -202,6 +201,10 @@ public class ScannerConfig {
 
 	public File getFieldBlankFile() {
 		return new File(imagesDirectory, FIELD_BLANK);
+	}
+
+	public File getFieldFlagFile() {
+		return new File(imagesDirectory, FIELD_FLAG);
 	}
 
 }
