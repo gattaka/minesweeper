@@ -7,9 +7,11 @@ public class Game {
 	private int height;
 
 	private FieldType[][] fields;
+	private boolean[][] skipHint;
 
 	public Game(int width, int height) {
 		fields = new FieldType[width][height];
+		skipHint = new boolean[width][height];
 		this.width = width;
 		this.height = height;
 	}
@@ -26,8 +28,8 @@ public class Game {
 		return fields;
 	}
 
-	public void setFields(FieldType[][] fields) {
-		this.fields = fields;
+	public boolean[][] getSkipHint() {
+		return skipHint;
 	}
 
 	public int getWidth() {

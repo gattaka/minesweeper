@@ -31,7 +31,8 @@ public class Scanner {
 			logger.info("Screenshot");
 			image = new Robot().createScreenCapture(
 					new Rectangle(config.getScreenX(), config.getScreenY(), config.getScreenW(), config.getScreenH()));
-			ImageIO.write(image, "png", new File(testScreensDir, "screenshot.png"));
+			// ImageIO.write(image, "png", new File(testScreensDir,
+			// "screenshot.png"));
 		} catch (Exception e) {
 			throw new IllegalStateException("Nezdaøilo se získat screenshot obrazovky");
 		}

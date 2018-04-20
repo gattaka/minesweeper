@@ -17,6 +17,8 @@ public class Solver {
 	private boolean clicked;
 	private boolean stuck;
 
+	private int stuckTolerance = 0;
+
 	public Solver(MouseRobot clicker, Scanner scanner) {
 		this.mouseRobot = clicker;
 		this.scanner = scanner;
@@ -54,6 +56,9 @@ public class Solver {
 		// provádí se O(x*y) kliknutí
 		for (int i = 0; i < game.getWidth() * game.getHeight(); i++) {
 
+			if (Main.isWPressed())
+				return;
+
 			if (!clicked)
 				stuck = true;
 			clicked = false;
@@ -73,10 +78,10 @@ public class Solver {
 				return;
 			}
 
-			if (!clicked) {
-				logger.info("Stuck...");
+			if (stuck) {
+				stuckTolerance++;
+				logger.info("Stuck... tolerance: {}", stuckTolerance);
 				scanner.debugPrint(game);
-				return;
 			}
 		}
 
@@ -85,10 +90,24 @@ public class Solver {
 	private void performSolving(Game game) throws AWTException {
 		for (int y = 0; y < game.getHeight(); y++)
 			for (int x = 0; x < game.getWidth(); x++) {
+
+				if (game.getSkipHint()[x][y])
+					continue;
+
 				if (stuck) {
 					// hledej neznámé pole, obklopené neznámými poli a
 					// tam zkusmo klikni
-					// TODO
+					if (FieldType.UNKNOWN.equals(game.getFields()[x][y])) {
+						int surroundingUknownCount = countSurroundFields(game, x, y, FieldType.UNKNOWN);
+						if (surroundingUknownCount == 8 - stuckTolerance
+								|| (x == 0 || x == game.getWidth() || y == 0 || y == game.getHeight())
+										&& surroundingUknownCount == 5 - stuckTolerance) {
+							clicked = true;
+							stuck = false;
+							mouseRobot.clickOnField(x, y, 1);
+							moveMouseAndCapture();
+						}
+					}
 				} else {
 					// jinak procházej pouze èísla a zkoušej akce v
 					// jejich okolí
@@ -137,6 +156,11 @@ public class Solver {
 		int surroundingFlagCount = countSurroundFields(game, x, y, FieldType.FLAG);
 		int surroundingUknownCount = countSurroundFields(game, x, y, FieldType.UNKNOWN);
 
+		if (surroundingUknownCount == 0) {
+			game.getSkipHint()[x][y] = true;
+			return null;
+		}
+
 		// procházej okolní pole, která jsou neznámá
 		for (int sy = y - 1; sy <= y + 1; sy++)
 			for (int sx = x - 1; sx <= x + 1; sx++) {
@@ -158,6 +182,8 @@ public class Solver {
 						surroundingFlagCount++;
 						surroundingUknownCount--;
 						game.getFields()[sx][sy] = FieldType.FLAG;
+						game.getSkipHint()[sx][sy] = true;
+						// return FieldType.UNKNOWN;
 						return FieldType.FLAG;
 					}
 				}
